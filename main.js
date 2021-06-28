@@ -34,17 +34,18 @@ class DragLines {
     }
 
     draw(sx, sy, ex, ey) {
-        //his.context.save();
+        this.context.save();
         this.context.lineCap = 'round';
         this.context.lineWidth = "3";
         this.context.strokeStyle = "blue";
-
         this.context.beginPath();
         this.context.moveTo(sx, sy);
         this.context.lineTo(ex, ey);
+        this.context.closePath();
         this.context.stroke();
 
-        //this.context.restore();
+
+        this.context.restore();
     }
 
 }
@@ -52,16 +53,22 @@ class DragLines {
 
 //grobal propatyes
 const dia = 20;
-const start_elps = new Elps(160, 190, dia);
-const end_elps = new Elps(300, 190, dia);
+let start_elps = new Elps(160, 190, dia);
+let end_elps = new Elps(300, 190, dia);
 const canvas = document.getElementById('draw_area');
 const context = canvas.getContext('2d');
 const drag_line = new DragLines(context);
 const draw_text = document.getElementById('draw_text');
 const side_text = document.getElementById('side_text');
 const side_img  = document.getElementById('SideImg');
+const a_point = [[160, 190, 300, 190], [210, 180, 210, 300], [250, 200, 230, 330]];
+const i_point = [[156, 179, 224, 265], [261, 189, 297, 283]];
+const u_point = [[199, 137, 278, 150], [166, 201, 202, 288]];
+const e_point = [[189, 142, 269, 147], [169, 195, 319, 290]];
+const o_point = [[162, 176, 256, 171], [207, 132, 247, 252], [281, 150, 320, 191]];
 let complete = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
-
+let count = 0;
+const end_event = new CustomEvent('next_game');
 //other functions
 function dist(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -84,7 +91,7 @@ function draw_line() {
     canvas.addEventListener('mousemove', e => {
         const downX = e.offsetX;
         const downY = e.offsetY;
-
+        console.log('(x, y) : ' + e.offsetX + ',' + e.offsetY);
         let prex = downX;
         let prey = downY;
         //drag_line.isDrag = true;
@@ -100,93 +107,127 @@ function draw_line() {
 }
 
 function next_elps(sx, sy, ex, ey) {
-    console.log('hit!!');
     start_elps.delete();
     end_elps.delete();
     start_elps.move(sx, sy);
     end_elps.move(ex, ey);
-    //start_elps.draw(context);
+    //start_elps.draw(context);s
     //end_elps.draw(context);
 }
 
-function next(elp_pos_data, next_text, next_side_text) {
-    let count = 0;
-    canvas.addEventListener('mousemove', e => {
-        //console.log('in the event');
-        //console.log(drag_line.isDrag);
-        console.log(count);
-        if(drag_line.isDrag) {
-            for(let i = 0; i < elp_pos_data.length; i++) {
-                console.log('for : ' + i);
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2 && count == i-1) {
-                    next_elps(elp_pos_data[i][0], elp_pos_data[i][1], elp_pos_data[i][2], elp_pos_data[i][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                    count ++;
-                }
-            }
-            if(count == elp_pos_data.length-1) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    complete[0] = true;
-                    count++;
-                }
-            }
-        }
-        if(count === elp_pos_data.length) {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            draw_text.textContent = next_text;
-            side_text.textContent = next_side_text;
-        }
-    });
+function text_change(text, subtext, img) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    draw_text.textContent = text;
+    side_text.textContent = subtext;
+    side_img.setAttribute('src', img); 
 }
 
-const a_point = [[160, 190, 300, 190], [210, 180, 210, 300], [250, 200, 210, 340]];
-const i_point = [[156, 179, 224, 265], [261, 189, 297, 283]];
+//window.addEventListener('next_game', text_change('い', 'いちご', 'images/itigo.png'));
 
-function loop() {
-    //window.requestAnimationFrame(loop)
-    window.requestAnimationFrame(draw_line);
-    let count = 0;
-    
-    canvas.addEventListener('mousemove', e => {
-        //console.log('in the event');
-        //console.log(drag_line.isDrag);
+function ittkaku_end(point_data, kakusu, index) {
+    canvas.addEventListener('mousemove', function func(e) {
         console.log(count);
-        console.log('mouseX, Y = ' + e.offsetX + ', ' + e.offsetY);
-        if(drag_line.isDrag) {
-            for(let i = 0; i < a_point.length; i++) {
-                console.log('for : ' + i);
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2 && count == i-1) {
-                    next_elps(a_point[i][0], a_point[i][1], a_point[i][2], a_point[i][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                    count ++;
+        if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) <= dia / 2) {
+            if(drag_line.isDrag === true) {
+                next_elps(point_data[0], point_data[1], point_data[2], point_data[3]);
+                start_elps.draw(context);
+                end_elps.draw(context);
+                count++;
+                if(count === kakusu) {//1文字分終わり
+                    complete.splice(index, 1, true);
+                    console.log(complete);
+                    window.dispatchEvent(end_event);
                 }
+                //console.log(count);
             }
-            if(count == a_point.length-1) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    complete[0] = true;
-                    count++;
-                }
-            }
-        }
-        if(count === a_point.length) {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            draw_text.textContent = 'い';
-            side_text.textContent = 'いちご';
-            side_img.setAttribute('src', 'images/itigo.png');
         }
     });
-    next(i_point, 'う', 'うどん');
-    console.log('ended');
-    //あ
-    
-    //い
-    //う
-    //え
-    //お
-   
-    
+    //canvas.removeEventListener('mousemove', function func(e));
+    //canvas.removeEventListener('mousemove', func, false);
 }
-loop();
-//window.addEventListener('load', loop, false);
+
+
+function main() {
+    draw_line();
+    start_elps.draw(context);
+    end_elps.draw(context);
+    console.log(complete);
+    if(complete[0] === false) {
+        ittkaku_end(a_point[1], 4, 0);
+        console.log('1st end');
+        ittkaku_end(a_point[2], 4, 0);
+    }
+    
+    window.addEventListener('next_game', e => {
+        console.log('new game');
+        if(complete[0] === true && complete[1] === false) {
+            console.log('a is end');
+            text_change('い', 'いちご', 'images/itigo.png');
+            start_elps = new Elps(i_point[0][0], i_point[0][1], dia);
+            end_elps = new Elps(i_point[0][2], i_point[0][3], dia);
+            start_elps.draw(context);
+            end_elps.draw(context);
+            canvas.addEventListener('mousemove', e => {
+                console.log('in!!');
+                if(count === 5){
+                    next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 6) {
+                    text_change('う', 'うどん', 'images/udon.png');
+                    start_elps = new Elps(u_point[0][0], u_point[0][1], dia);
+                    end_elps = new Elps(u_point[0][2], u_point[0][3], dia);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 7) {
+                    next_elps(u_point[1][0], u_point[1][1], u_point[1][2], u_point[1][3]);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 8) {
+                    text_change('え', 'えほん', 'images/ehon.png');
+                    start_elps = new Elps(e_point[0][0], e_point[0][1], dia);
+                    end_elps = new Elps(e_point[0][2], e_point[0][3], dia);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 9) {
+                    next_elps(e_point[1][0], e_point[1][1], e_point[1][2], e_point[1][3]);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 10) {
+                    text_change('お', 'おわん', 'images/owan.png');
+                    start_elps = new Elps(o_point[0][0], o_point[0][1], dia);
+                    end_elps = new Elps(o_point[0][2], o_point[0][3], dia);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 11) {
+                    next_elps(o_point[1][0], o_point[1][1], o_point[1][2], o_point[1][3]);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                } else if(count === 12) {
+                    next_elps(o_point[2][0], o_point[2][1], o_point[2][2], o_point[2][3]);
+                    start_elps.draw(context);
+                    end_elps.draw(context);
+                }
+            })
+            /*
+            if(count === 0) {
+                console.log('i 1st');
+                next_elps(i_point[0][0], i_point[0][1], i_point[0][2], i_point[0][3])
+                start_elps.draw(context);
+                end_elps.draw(context);
+
+            } else if(count === 1) {
+                console.log('i 2nd');
+                next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
+                start_elps.draw(context);
+                end_elps.draw(context);
+            }
+            */
+        }    
+    });
+    
+    
+
+    //window.requestAnimationFrame(main)
+}
+main();
