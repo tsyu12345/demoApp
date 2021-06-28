@@ -207,6 +207,9 @@ function main() {
                     next_elps(o_point[2][0], o_point[2][1], o_point[2][2], o_point[2][3]);
                     start_elps.draw(context);
                     end_elps.draw(context);
+                } else if(count === 13) {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    draw_text.textContent = '終わり'
                 }
             })
             /*
