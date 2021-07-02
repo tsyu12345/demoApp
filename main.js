@@ -91,7 +91,6 @@ function draw_line() {
     canvas.addEventListener('mousemove', e => {
         const downX = e.offsetX;
         const downY = e.offsetY;
-        console.log('(x, y) : ' + e.offsetX + ',' + e.offsetY);
         let prex = downX;
         let prey = downY;
         //drag_line.isDrag = true;
@@ -117,6 +116,7 @@ function next_elps(sx, sy, ex, ey) {
 
 function text_change(text, subtext, img) {
     context.clearRect(0, 0, canvas.width, canvas.height);
+    console.log('canvasClear')
     draw_text.textContent = text;
     side_text.textContent = subtext;
     side_img.setAttribute('src', img); 
@@ -148,71 +148,194 @@ function ittkaku_end(point_data, kakusu, index) {
 
 
 function main() {
+    let clear = false;
     draw_line();
     start_elps.draw(context);
     end_elps.draw(context);
-    console.log(complete);
-    if(complete[0] === false) {
-        ittkaku_end(a_point[1], 4, 0);
-        console.log('1st end');
-        ittkaku_end(a_point[2], 4, 0);
-    }
-    
-    window.addEventListener('next_game', e => {
-        console.log('new game');
-        if(complete[0] === true && complete[1] === false) {
-            console.log('a is end');
-            text_change('い', 'いちご', 'images/itigo.png');
-            start_elps = new Elps(i_point[0][0], i_point[0][1], dia);
-            end_elps = new Elps(i_point[0][2], i_point[0][3], dia);
-            start_elps.draw(context);
-            end_elps.draw(context);
-            canvas.addEventListener('mousemove', e => {
-                console.log('in!!');
-                if(count === 5){
-                    next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 6) {
-                    text_change('う', 'うどん', 'images/udon.png');
-                    start_elps = new Elps(u_point[0][0], u_point[0][1], dia);
-                    end_elps = new Elps(u_point[0][2], u_point[0][3], dia);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 7) {
-                    next_elps(u_point[1][0], u_point[1][1], u_point[1][2], u_point[1][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 8) {
-                    text_change('え', 'えほん', 'images/ehon.png');
-                    start_elps = new Elps(e_point[0][0], e_point[0][1], dia);
-                    end_elps = new Elps(e_point[0][2], e_point[0][3], dia);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 9) {
-                    next_elps(e_point[1][0], e_point[1][1], e_point[1][2], e_point[1][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 10) {
-                    text_change('お', 'おわん', 'images/owan.png');
-                    start_elps = new Elps(o_point[0][0], o_point[0][1], dia);
-                    end_elps = new Elps(o_point[0][2], o_point[0][3], dia);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 11) {
-                    next_elps(o_point[1][0], o_point[1][1], o_point[1][2], o_point[1][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 12) {
-                    next_elps(o_point[2][0], o_point[2][1], o_point[2][2], o_point[2][3]);
-                    start_elps.draw(context);
-                    end_elps.draw(context);
-                } else if(count === 13) {
-                    context.clearRect(0, 0, canvas.width, canvas.height);
-                    draw_text.textContent = '終わり'
+    canvas.addEventListener('mousemove', e => {
+        draw_line()
+        if(complete[0] === false) {
+            if(count === 0) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        count++;
+                    }
                 }
-            })
-            /*
+            } else if(count===1) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(a_point[1][0], a_point[1][1], a_point[1][2], a_point[1][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count===2) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(a_point[2][0], a_point[2][1], a_point[2][2], a_point[2][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count === 3) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        complete.splice(0, 1, true);
+                        clear = true;
+                        count++;
+                    }
+                }
+            }
+
+        } else if(complete[1] === false) {
+            if(clear === true) {
+                text_change('い', 'いちご', 'images/itigo.png');
+                clear = false;
+                start_elps = new Elps(i_point[0][0], i_point[0][1], dia);
+                end_elps = new Elps(i_point[0][2], i_point[0][3], dia);
+                start_elps.draw(context);
+                end_elps.draw(context);
+            }
+            if(count === 4) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if(count === 5) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count === 6) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        complete.splice(1, 1, true);
+                        count++;
+                        clear = true;
+                    }
+                }
+            }  
+        } else if(complete[2] === false) {
+            if(clear === true) {
+                text_change('う', 'うどん', 'images/udon.png');
+                clear = false;
+                start_elps = new Elps(u_point[0][0], u_point[0][1], dia);
+                end_elps = new Elps(u_point[0][2], u_point[0][3], dia);
+                start_elps.draw(context);
+                end_elps.draw(context);
+            }
+            if(count === 7) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if(count === 8) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(u_point[1][0], u_point[1][1], u_point[1][2], u_point[1][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count === 9) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        complete.splice(2, 1, true);
+                        clear = true;
+                        count++;
+                    }
+                }
+            }
+        } else if(complete[3] === false) {
+            if(clear === true) {
+                text_change('え', 'えほん', 'images/udon.png');
+                clear = false;
+                start_elps = new Elps(e_point[0][0], e_point[0][1], dia);
+                end_elps = new Elps(e_point[0][2], e_point[0][3], dia);
+                start_elps.draw(context);
+                end_elps.draw(context);
+            }
+            if(count === 10) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if(count === 11) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(e_point[1][0], e_point[1][1], e_point[1][2], e_point[1][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count === 12) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        complete.splice(3, 1, true);
+                        clear = true;
+                        count++;
+                    }
+                }
+            }
+        } else if(complete[4] === false) {
+            if(clear === true) {
+                text_change('お', 'おわん', 'images/owan.png');
+                clear = false;
+                start_elps = new Elps(o_point[0][0], o_point[0][1], dia);
+                end_elps = new Elps(o_point[0][2], o_point[0][3], dia);
+                start_elps.draw(context);
+                end_elps.draw(context);
+            }
+            if(count === 13) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if(count === 14) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(o_point[1][0], o_point[1][1], o_point[1][2], o_point[1][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count === 15) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        next_elps(o_point[2][0], o_point[2][1], o_point[2][2], o_point[2][3]);
+                        start_elps.draw(context);
+                        end_elps.draw(context);
+                        count++;
+                    }
+                }
+            } else if(count === 16) {
+                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if(drag_line.isDrag === true) {
+                        complete.splice(4, 1, true);
+                        clear = true;
+                    }
+                }
+            }
+        } else if(complete[4] === true) {
+            text_change('終', 'おわり', 'images/owan.png');
+        }
+    });
+}
+    
+    /*
             if(count === 0) {
                 console.log('i 1st');
                 next_elps(i_point[0][0], i_point[0][1], i_point[0][2], i_point[0][3])
@@ -226,11 +349,8 @@ function main() {
                 end_elps.draw(context);
             }
             */
-        }    
-    });
+        
     
-    
-
     //window.requestAnimationFrame(main)
-}
+
 main();
