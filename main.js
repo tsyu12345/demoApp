@@ -36,7 +36,7 @@ class DragLines {
     draw(sx, sy, ex, ey) {
         this.context.save();
         this.context.lineCap = 'round';
-        this.context.lineWidth = "3";
+        this.context.lineWidth = 3;
         this.context.strokeStyle = "blue";
         this.context.beginPath();
         this.context.moveTo(sx, sy);
