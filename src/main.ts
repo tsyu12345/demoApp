@@ -11,7 +11,7 @@ class Elps {
         this.y = y;
     }
 
-    draw(context) {
+    draw(context:CanvasRenderingContext2D) {
         context.beginPath();
         context.arc(this.x, this.y, this.dia, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
         context.strokeStyle = 'rgba(255, 0, 0, 1)';
@@ -60,8 +60,8 @@ class DragLines {
 const dia:number = 20;
 let start_elps = new Elps(160, 190, dia);
 let end_elps = new Elps(300, 190, dia);
-const canvas:HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('draw_area');
-const context:CanvasRenderingContext2D = canvas.getContext('2d');
+const canvas = <HTMLCanvasElement>document.getElementById('draw_area');
+const context =<CanvasRenderingContext2D> canvas.getContext('2d');
 const drag_line = new DragLines(context);
 const draw_text = <HTMLElement>document.getElementById('draw_text');
 const side_text = <HTMLElement>document.getElementById('side_text');
@@ -78,6 +78,7 @@ let clear:boolean = false;
 function dist(x1:number, y1:number, x2:number, y2:number):number{
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
+
 
 function draw_line():void {
     canvas.addEventListener('mouseout', e => {
@@ -183,7 +184,7 @@ function main() :void{
 
         } else if (complete[1] === false) {
             if (clear === true) {
-                inittialize_text(['い', 'いちご', 'images/itigo.png'], i_point[0]);
+                inittialize_text(['い', 'いちご', '../src/images/itigo.png'], i_point[0]);
             }
             if (count === 0) {
                 if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
@@ -198,7 +199,7 @@ function main() :void{
             }
         } else if (complete[2] === false) {
             if (clear === true) {
-                inittialize_text(['う', 'うどん', 'images/udon.png'], u_point[0]);
+                inittialize_text(['う', 'うどん', '../src/images/udon.png'], u_point[0]);
             }
             if (count === 0) {
                 if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
@@ -213,7 +214,7 @@ function main() :void{
             }
         } else if (complete[3] === false) {
             if (clear === true) {
-                inittialize_text(['え', 'えほん', 'images/ehon.png'], e_point[0]);
+                inittialize_text(['え', 'えほん', '../src/images/ehon.png'], e_point[0]);
             }
             if (count === 0) {
                 if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
@@ -229,7 +230,7 @@ function main() :void{
 
         } else if (complete[4] === false) {
             if (clear === true) {
-                inittialize_text(['お', 'おわん', 'images/owan.png'], o_point[0]);
+                inittialize_text(['お', 'おわん', '../src/images/owan.png'], o_point[0]);
             }
             if (count === 0) {
                 if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
@@ -245,7 +246,7 @@ function main() :void{
                 itimozi_end(e.offsetX, e.offsetY, 4);
             }
         } else if (complete[4] === true) {
-            text_change('終', 'おわり', 'images/owan.png');
+            text_change('終', 'おわり', '../src/images/owan.png');
         }
     });
 }
