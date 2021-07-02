@@ -60,7 +60,7 @@ const context = canvas.getContext('2d');
 const drag_line = new DragLines(context);
 const draw_text = document.getElementById('draw_text');
 const side_text = document.getElementById('side_text');
-const side_img  = document.getElementById('SideImg');
+const side_img = document.getElementById('SideImg');
 const a_point = [[160, 190, 300, 190], [210, 180, 210, 300], [250, 200, 230, 330]];
 const i_point = [[156, 179, 224, 265], [261, 189, 297, 283]];
 const u_point = [[199, 137, 278, 150], [166, 201, 202, 288]];
@@ -68,7 +68,7 @@ const e_point = [[189, 142, 269, 147], [169, 195, 319, 290]];
 const o_point = [[162, 176, 256, 171], [207, 132, 247, 252], [281, 150, 320, 191]];
 let complete = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
 let count = 0;
-const end_event = new CustomEvent('next_game');
+let clear = false;
 //other functions
 function dist(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -119,238 +119,147 @@ function text_change(text, subtext, img) {
     console.log('canvasClear')
     draw_text.textContent = text;
     side_text.textContent = subtext;
-    side_img.setAttribute('src', img); 
+    side_img.setAttribute('src', img);
 }
 
-//window.addEventListener('next_game', text_change('い', 'いちご', 'images/itigo.png'));
+function inittialize_text(change_data, point_data) {
+    count = 0;
+    text_change(change_data[0], change_data[1], change_data[2]);
+    clear = false;
+    start_elps = new Elps(point_data[0], point_data[1], dia);
+    end_elps = new Elps(point_data[2], point_data[3], dia);
+    start_elps.draw(context);
+    end_elps.draw(context);
+}
 
-function ittkaku_end(point_data, kakusu, index) {
-    canvas.addEventListener('mousemove', function func(e) {
-        console.log(count);
-        if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) <= dia / 2) {
-            if(drag_line.isDrag === true) {
-                next_elps(point_data[0], point_data[1], point_data[2], point_data[3]);
-                start_elps.draw(context);
-                end_elps.draw(context);
-                count++;
-                if(count === kakusu) {//1文字分終わり
-                    complete.splice(index, 1, true);
-                    console.log(complete);
-                    window.dispatchEvent(end_event);
-                }
-                //console.log(count);
-            }
+function itimozi_end(mx, my, index) {
+    if (dist(mx, my, end_elps.x, end_elps.y) < dia / 2) {
+        if (drag_line.isDrag === true) {
+            complete.splice(index, 1, true);
+            clear = true;
+            count++;
         }
-    });
-    //canvas.removeEventListener('mousemove', function func(e));
-    //canvas.removeEventListener('mousemove', func, false);
+    }
 }
 
-
+function ittkaku_play(mx, my, point_data) {
+    if (dist(mx, my, end_elps.x, end_elps.y) < dia / 2) {
+        if (drag_line.isDrag === true) {
+            next_elps(point_data[0], point_data[1], point_data[2], point_data[3]);
+            start_elps.draw(context);
+            end_elps.draw(context);
+            count++;
+        }
+    }
+}
+//main function
 function main() {
-    let clear = false;
+
     draw_line();
     start_elps.draw(context);
     end_elps.draw(context);
     canvas.addEventListener('mousemove', e => {
         draw_line()
-        if(complete[0] === false) {
-            if(count === 0) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
+        if (complete[0] === false) {
+            if (count === 0) {
+                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if (drag_line.isDrag === true) {
                         count++;
                     }
                 }
-            } else if(count===1) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(a_point[1][0], a_point[1][1], a_point[1][2], a_point[1][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count===2) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(a_point[2][0], a_point[2][1], a_point[2][2], a_point[2][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count === 3) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        complete.splice(0, 1, true);
-                        clear = true;
-                        count++;
-                    }
-                }
+            } else if (count === 1) {
+                ittkaku_play(e.offsetX, e.offsetY, a_point[count]);
+            } else if (count === 2) {
+                ittkaku_play(e.offsetX, e.offsetY, a_point[count]);
+            } else if (count === 3) {
+                itimozi_end(e.offsetX, e.offsetY, 0);
             }
 
-        } else if(complete[1] === false) {
-            if(clear === true) {
-                text_change('い', 'いちご', 'images/itigo.png');
-                clear = false;
-                start_elps = new Elps(i_point[0][0], i_point[0][1], dia);
-                end_elps = new Elps(i_point[0][2], i_point[0][3], dia);
-                start_elps.draw(context);
-                end_elps.draw(context);
+        } else if (complete[1] === false) {
+            if (clear === true) {
+                inittialize_text(['い', 'いちご', 'images/itigo.png'], i_point[0]);
             }
-            if(count === 4) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
+            if (count === 0) {
+                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if (drag_line.isDrag === true) {
                         count++;
                     }
                 }
-            } else if(count === 5) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count === 6) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        complete.splice(1, 1, true);
-                        count++;
-                        clear = true;
-                    }
-                }
-            }  
-        } else if(complete[2] === false) {
-            if(clear === true) {
-                text_change('う', 'うどん', 'images/udon.png');
-                clear = false;
-                start_elps = new Elps(u_point[0][0], u_point[0][1], dia);
-                end_elps = new Elps(u_point[0][2], u_point[0][3], dia);
-                start_elps.draw(context);
-                end_elps.draw(context);
+            } else if (count === 1) {
+                ittkaku_play(e.offsetX, e.offsetY, i_point[count]);
+            } else if (count === 2) {
+                itimozi_end(e.offsetX, e.offsetY, 1);
             }
-            if(count === 7) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if(count === 8) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(u_point[1][0], u_point[1][1], u_point[1][2], u_point[1][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count === 9) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        complete.splice(2, 1, true);
-                        clear = true;
-                        count++;
-                    }
-                }
+        } else if (complete[2] === false) {
+            if (clear === true) {
+                inittialize_text(['う', 'うどん', 'images/udon.png'], u_point[0]);
             }
-        } else if(complete[3] === false) {
-            if(clear === true) {
-                text_change('え', 'えほん', 'images/udon.png');
-                clear = false;
-                start_elps = new Elps(e_point[0][0], e_point[0][1], dia);
-                end_elps = new Elps(e_point[0][2], e_point[0][3], dia);
-                start_elps.draw(context);
-                end_elps.draw(context);
+            if (count === 0) {
+                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if (drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if (count === 1) {
+                ittkaku_play(e.offsetX, e.offsetY, u_point[count]);
+            } else if (count === 2) {
+                itimozi_end(e.offsetX, e.offsetY, 2);
             }
-            if(count === 10) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if(count === 11) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(e_point[1][0], e_point[1][1], e_point[1][2], e_point[1][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count === 12) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        complete.splice(3, 1, true);
-                        clear = true;
-                        count++;
-                    }
-                }
+        } else if (complete[3] === false) {
+            if (clear === true) {
+                inittialize_text(['え', 'えほん', 'images/ehon.png'], e_point[0]);
             }
-        } else if(complete[4] === false) {
-            if(clear === true) {
-                text_change('お', 'おわん', 'images/owan.png');
-                clear = false;
-                start_elps = new Elps(o_point[0][0], o_point[0][1], dia);
-                end_elps = new Elps(o_point[0][2], o_point[0][3], dia);
-                start_elps.draw(context);
-                end_elps.draw(context);
+            if (count === 0) {
+                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if (drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if (count === 1) {
+                ittkaku_play(e.offsetX, e.offsetY, e_point[count])
+            } else if (count === 2) {
+                itimozi_end(e.offsetX, e.offsetY, 3);
             }
-            if(count === 13) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if(count === 14) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(o_point[1][0], o_point[1][1], o_point[1][2], o_point[1][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count === 15) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        next_elps(o_point[2][0], o_point[2][1], o_point[2][2], o_point[2][3]);
-                        start_elps.draw(context);
-                        end_elps.draw(context);
-                        count++;
-                    }
-                }
-            } else if(count === 16) {
-                if(dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if(drag_line.isDrag === true) {
-                        complete.splice(4, 1, true);
-                        clear = true;
-                    }
-                }
+
+        } else if (complete[4] === false) {
+            if (clear === true) {
+                inittialize_text(['お', 'おわん', 'images/owan.png'], o_point[0]);
             }
-        } else if(complete[4] === true) {
+            if (count === 0) {
+                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
+                    if (drag_line.isDrag === true) {
+                        count++;
+                    }
+                }
+            } else if (count === 1) {
+                ittkaku_play(e.offsetX, e.offsetY, o_point[count]);
+            } else if (count === 2) {
+                ittkaku_play(e.offsetX, e.offsetY, o_point[count]);
+            } else if (count === 3) {
+                itimozi_end(e.offsetX, e.offsetY, 4);
+            }
+        } else if (complete[4] === true) {
             text_change('終', 'おわり', 'images/owan.png');
         }
     });
 }
-    
-    /*
-            if(count === 0) {
-                console.log('i 1st');
-                next_elps(i_point[0][0], i_point[0][1], i_point[0][2], i_point[0][3])
-                start_elps.draw(context);
-                end_elps.draw(context);
 
-            } else if(count === 1) {
-                console.log('i 2nd');
-                next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
-                start_elps.draw(context);
-                end_elps.draw(context);
-            }
-            */
-        
-    
-    //window.requestAnimationFrame(main)
+/*
+        if(count === 0) {
+            console.log('i 1st');
+            next_elps(i_point[0][0], i_point[0][1], i_point[0][2], i_point[0][3])
+            start_elps.draw(context);
+            end_elps.draw(context);
+
+        } else if(count === 1) {
+            console.log('i 2nd');
+            next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
+            start_elps.draw(context);
+            end_elps.draw(context);
+        }
+        */
+
+
+//window.requestAnimationFrame(main)
 
 main();
