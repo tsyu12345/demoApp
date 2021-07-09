@@ -11,10 +11,16 @@ module.exports = {
     },
     output: {
         path: path.join(__dirname, "dist"),//コンパイル後の出力パス
-        filename:'index.js'
+        assetModuleFilename: 'images/[name][ext]',
     },
     module: {
         rules: [
+            {
+                test: /\.(png|jpeg|gif)$/,
+                type:'asset/resource'
+            },
+
+            
             {
                 test: /\.ts$/,
                 use: 'ts-loader',
@@ -43,7 +49,9 @@ module.exports = {
         extensions: [
             '.ts',
             '.js',
-            '.css'
+            '.css',
+            '.png',
+            '.jpeg'
         ]
     }
 }
