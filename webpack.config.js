@@ -1,5 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MODE = "development";
+const enableedSourceMap = MODE === "development";
+
 
 module.exports = {
     mode:'development',
@@ -22,7 +25,7 @@ module.exports = {
                     'style-loader',
                     {
                         loader: "css-loader",
-                        options: {url:false}
+                        options: {url:false, sourceMap:enableedSourceMap}
                     }
                 ]
             }

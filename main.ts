@@ -1,3 +1,5 @@
+import "./styles/style.css";
+
 //円オブジェクト
 class Elps {
 
