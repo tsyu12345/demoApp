@@ -13,7 +13,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, "dist"),//コンパイル後の出力パス
         filename:'index.js', //jsファイル出力のファイル名
-        assetModuleFilename: 'images/[name][ext]',
+        assetModuleFilename: 'images/[name][ext]', //webpack5でfile-loaderを利用する。別ディレクトリにファイルを出力。
     },
     devtool: 'source-map',//ソースマッピングのスタイル設定
     target: 'node',　//特定開発環境のターゲット※ここではNode.js

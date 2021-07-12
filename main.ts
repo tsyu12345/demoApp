@@ -1,9 +1,9 @@
-import "./styles/style.css";
-import "./images/baby.jpeg";
-import "./images/ehon.png";
-import "./images/itigo.png";
-import "./images/owan.png";
-import "./images/udon.png";
+import "./styles/style";
+import "./images/baby";
+import "./images/ehon";
+import "./images/itigo";
+import "./images/owan";
+import "./images/udon";
 
 //円オブジェクト
 class Elps {
@@ -85,7 +85,6 @@ let clear:boolean = false;
 function dist(x1:number, y1:number, x2:number, y2:number):number{
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
-
 
 function draw_line():void {
     canvas.addEventListener('mouseout', e => {

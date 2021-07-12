@@ -1,9 +1,9 @@
-import "./styles/style.css";
-import "./images/baby.jpeg";
-import "./images/ehon.png";
-import "./images/itigo.png";
-import "./images/owan.png";
-import "./images/udon.png";
+import "./styles/style";
+import "./images/baby";
+import "./images/ehon";
+import "./images/itigo";
+import "./images/owan";
+import "./images/udon";
 
 //円オブジェクト
 class Elps {
