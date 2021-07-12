@@ -1,11 +1,11 @@
 {
-  "name": "tstutorial",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "private": true,
-  "scripts": {
+  "name": "tstutorial", //作成するモジュールの名前
+  "version": "1.0.0",//そのバージョン名
+  "main": "dist/index.js",//モジュール中で１番目に呼ばれるファイル:相対パス指定のみ
+  "private": true, //パッケージを公開するか否か
+  "scripts": { //npm ...のコマンド実行時に自動的に呼び出すコマンドを指定
     "tsc": "tsc",
-    "build": "webpack",
+    "build": "webpack",　
     "watch": "webpack -w",
     "start": "node .",
     "dev": "ts-node src/main.ts",
@@ -14,7 +14,7 @@
   },
   "author": "syu takabayashi <syukunt@icloud.com> (https://github.com/tsyu12345)",
   "license": "ISC",
-  "devDependencies": {
+  "devDependencies": { //各ツールとそのバージョン：＠→ピッタリそのバージョン、^, ~。
     "@types/node": "^14.17.5",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.2.2",
@@ -31,7 +31,7 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {},
-  "repository": {
+  "repository": { //リポジトリの情報
     "type": "git",
     "url": "git+https://github.com/tsyu12345/baito_demoApp1.git"
   },
