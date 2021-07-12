@@ -47,10 +47,11 @@ module.exports = {
         })
     ],
     resolve: {
+        /*
         modules: [
-            "node_modules",
-        ],
-        extensions: [
+            "./node_modules",
+        ],*/
+        extensions: [ //jsファイルでのimport時に拡張子を外して記載する
             '.ts',
             '.js',
             '.css',
