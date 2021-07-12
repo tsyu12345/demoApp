@@ -14,7 +14,7 @@
   },
   "author": "syu takabayashi <syukunt@icloud.com> (https://github.com/tsyu12345)",
   "license": "ISC",
-  "devDependencies": { //各ツールとそのバージョン：＠→ピッタリそのバージョン、^, ~。
+  "devDependencies": { //各ツールとそのバージョン：＠→ピッタリそのバージョン、^メジャーバージョンの一致, ~マイナーバージョン（中間）の一致。
     "@types/node": "^14.17.5",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.2.2",

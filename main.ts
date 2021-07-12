@@ -1,5 +1,5 @@
 import "./styles/style";
-import "./images/baby";
+import "./images/baby"; 
 import "./images/ehon";
 import "./images/itigo";
 import "./images/owan";
@@ -11,20 +11,21 @@ class Elps {
     dia:number;
     x:number;
     y:number;
-
-    constructor(x:number, y:number, elp_dia:number) {
+    context: CanvasRenderingContext2D;
+    constructor(x:number, y:number, elp_dia:number, canvas:HTMLCanvasElement) {
         this.dia = elp_dia;
         this.x = x;
         this.y = y;
+        this.context = <CanvasRenderingContext2D>canvas.getContext("2d");
     }
 
-    draw(context:CanvasRenderingContext2D) {
-        context.beginPath();
-        context.arc(this.x, this.y, this.dia, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
-        context.strokeStyle = 'rgba(255, 0, 0, 1)';
-        context.lineWidth = 3;
-        context.closePath();
-        context.stroke();
+    draw() {
+        this.context.beginPath();
+        this.context.arc(this.x, this.y, this.dia, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
+        this.context.strokeStyle = 'rgba(255, 0, 0, 1)';
+        this.context.lineWidth = 3;
+        this.context.closePath();
+        this.context.stroke();
     }
 
     move(x:number, y:number) {
@@ -34,7 +35,7 @@ class Elps {
 
     delete() {
         //this.context.save()
-        context.clearRect(this.x - this.dia / 2 - 12, this.y - this.dia / 2 - 12, this.dia + 25, this.dia + 25);
+        this.context.clearRect(this.x - this.dia / 2 - 12, this.y - this.dia / 2 - 12, this.dia + 25, this.dia + 25);
     }
 }
 
@@ -42,12 +43,15 @@ class Elps {
 class DragLines {
     context:CanvasRenderingContext2D;
     isDrag:boolean;
-    constructor(context:CanvasRenderingContext2D) {
-        this.context = context
+    constructor(canvas:HTMLCanvasElement) {
+        this.context = <CanvasRenderingContext2D>canvas.getContext("2d");
         this.isDrag = false;
     }
-
-    draw(sx:number, sy:number, ex:number, ey:number) {
+    /*
+    judge_draw() :boolean {
+    }
+    */
+    draw(sx:number, sy:number, ex:number, ey:number):void {
         this.context.save();
         this.context.lineCap = 'round';
         this.context.lineWidth = 3;
@@ -62,31 +66,61 @@ class DragLines {
 
 }
 
+class Text {
+    draw_txt_id:string;
+    side_txt_id:string;
+    side_img_id:string;
+    constructor(dt_id:string, st_id:string, simg_id:string) {
+        this.draw_txt_id = dt_id;
+        this.side_txt_id = st_id;
+        this.side_img_id = simg_id;
+    }
 
-//grobal propatyes
-const dia:number = 20;
-let start_elps = new Elps(160, 190, dia);
-let end_elps = new Elps(300, 190, dia);
-const canvas = <HTMLCanvasElement>document.getElementById('draw_area');
-const context =<CanvasRenderingContext2D> canvas.getContext('2d');
-const drag_line = new DragLines(context);
-const draw_text = <HTMLElement>document.getElementById('draw_text');
-const side_text = <HTMLElement>document.getElementById('side_text');
-const side_img = <HTMLElement>document.getElementById('SideImg');
-const a_point:Array<Array<number>> = [[160, 190, 300, 190], [210, 180, 210, 300], [250, 200, 230, 330]];
-const i_point:Array<Array<number>> = [[156, 179, 224, 265], [261, 189, 297, 283]];
-const u_point:Array<Array<number>> = [[199, 137, 278, 150], [166, 201, 202, 288]];
-const e_point:Array<Array<number>> = [[189, 142, 269, 147], [169, 195, 319, 290]];
-const o_point:Array<Array<number>> = [[162, 176, 256, 171], [207, 132, 247, 252], [281, 150, 320, 191]];
-let complete:Array<boolean> = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
-let count:number= 0;
-let clear:boolean = false;
+    text_init(main_text:string, side_text:string, img_path:string): void {
+        const draw_txt_elm = <HTMLElement>document.getElementById(this.draw_txt_id);
+        const side_txt_elm = <HTMLElement>document.getElementById(this.side_txt_id)
+        const side_img = <HTMLElement>document.getElementById(this.side_img_id);
+        draw_txt_elm.textContent = main_text;
+        side_txt_elm.textContent = side_text;
+        side_img.setAttribute('src', img_path);
+    }
+}
+
+class GamePlay { 
+    canvas: HTMLCanvasElement;
+    context: CanvasRenderingContext2D;
+    dia:number = 20;
+    constructor(canvas_in:HTMLCanvasElement) {
+        this.canvas = <HTMLCanvasElement>canvas_in;
+        this.context = <CanvasRenderingContext2D>this.canvas.getContext("2d");
+    }
+    play(point_data:Array<Array<number>>/*円の座標配列(len = 4)*/, mouse_point:Array<number>/*マウス座標配列*/, ):boolean {
+        let st_elps = new Elps(point_data[0][0], point_data[0][1], this.dia, this.canvas);
+        let ed_elps = new Elps(point_data[0][2], point_data[0][3], this.dia, this.canvas);
+
+        for(let i: number; i < point_data.length-1; i++) {
+            if(dist(ed_elps.x, ed_elps.y, mouse_point[0], mouse_point[1]) <= this.dia / 2) {
+                st_elps.delete();
+                ed_elps.delete();
+                st_elps.move(point_data[i+1][0], point_data[i+1][1]);
+                ed_elps.move(point_data[i+1][2], point_data[i+1][3]);
+            }
+        }
+        if(dist(ed_elps.x, ed_elps.y, mouse_point[0], mouse_point[1]) <= this.dia / 2) { //最終画の判定
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); //canvasクリア
+            return true;
+        }
+    }
+}
+
+
 //other functions
 function dist(x1:number, y1:number, x2:number, y2:number):number{
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
-function draw_line():void {
+function draw_line(canvas:HTMLCanvasElement):void {
+    const drag_line = new DragLines(canvas);
     canvas.addEventListener('mouseout', e => {
         drag_line.isDrag = false;
     });
@@ -117,162 +151,49 @@ function draw_line():void {
     });
 }
 
-function next_elps(sx:number, sy:number, ex:number, ey:number) :void{
-    start_elps.delete();
-    end_elps.delete();
-    start_elps.move(sx, sy);
-    end_elps.move(ex, ey);
-    //start_elps.draw(context);s
-    //end_elps.draw(context);
-}
-
-
-function text_change(text:string, subtext:string, img:string) :void{
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    //console.log('canvasClear')
-    draw_text.textContent = text;
-    side_text.textContent = subtext;
-    side_img.setAttribute('src', img);
-}
-
-function inittialize_text(change_data:Array<string>, point_data:Array<number>) :void{
-    count = 0;
-    text_change(change_data[0], change_data[1], change_data[2]);
-    clear = false;
-    start_elps = new Elps(point_data[0], point_data[1], dia);
-    end_elps = new Elps(point_data[2], point_data[3], dia);
-    start_elps.draw(context);
-    end_elps.draw(context);
-}
-
-function itimozi_end(mx:number, my:number, index:number): void {
-    if (dist(mx, my, end_elps.x, end_elps.y) < dia / 2) {
-        if (drag_line.isDrag === true) {
-            complete.splice(index, 1, true);
-            clear = true;
-            count++;
-        }
-    }
-}
-
-function ittkaku_play(mx:number, my:number, point_data:Array<number>): void{
-    if (dist(mx, my, end_elps.x, end_elps.y) < dia / 2) {
-        if (drag_line.isDrag === true) {
-            next_elps(point_data[0], point_data[1], point_data[2], point_data[3]);
-            start_elps.draw(context);
-            end_elps.draw(context);
-            count++;
-        }
-    }
-}
 //main function
-function main() :void{
-
-    draw_line();
-    start_elps.draw(context);
-    end_elps.draw(context);
+function main() :void {
+    const a_point:Array<Array<number>> = [[160, 190, 300, 190], [210, 180, 210, 300], [250, 200, 230, 330]];
+    const i_point:Array<Array<number>> = [[156, 179, 224, 265], [261, 189, 297, 283]];
+    const u_point:Array<Array<number>> = [[199, 137, 278, 150], [166, 201, 202, 288]];
+    const e_point:Array<Array<number>> = [[189, 142, 269, 147], [169, 195, 319, 290]];
+    const o_point:Array<Array<number>> = [[162, 176, 256, 171], [207, 132, 247, 252], [281, 150, 320, 191]];
+    let complete:Array<boolean> = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
+    const main_text_id:string = 'draw_text';
+    const side_text_id:string = 'side_text';
+    const side_img_id:string = 'side_img';
+    const text_obj = new Text(main_text_id, side_text_id, side_img_id);
+    const canvas = <HTMLCanvasElement>document.getElementById('draw_area');
+    //const context = <CanvasRenderingContext2D> canvas.getContext('2d');
+    draw_line(canvas);
+    const game = new GamePlay(canvas);
+    let judge:boolean = false;
     canvas.addEventListener('mousemove', e => {
-        draw_line()
-        if (complete[0] === false) {
-            if (count === 0) {
-                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if (drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if (count === 1) {
-                ittkaku_play(e.offsetX, e.offsetY, a_point[count]);
-            } else if (count === 2) {
-                ittkaku_play(e.offsetX, e.offsetY, a_point[count]);
-            } else if (count === 3) {
-                itimozi_end(e.offsetX, e.offsetY, 0);
-            }
-
-        } else if (complete[1] === false) {
-            if (clear === true) {
-                inittialize_text(['い', 'いちご', '../src/images/itigo.png'], i_point[0]);
-            }
-            if (count === 0) {
-                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if (drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if (count === 1) {
-                ittkaku_play(e.offsetX, e.offsetY, i_point[count]);
-            } else if (count === 2) {
-                itimozi_end(e.offsetX, e.offsetY, 1);
-            }
-        } else if (complete[2] === false) {
-            if (clear === true) {
-                inittialize_text(['う', 'うどん', '../src/images/udon.png'], u_point[0]);
-            }
-            if (count === 0) {
-                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if (drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if (count === 1) {
-                ittkaku_play(e.offsetX, e.offsetY, u_point[count]);
-            } else if (count === 2) {
-                itimozi_end(e.offsetX, e.offsetY, 2);
-            }
-        } else if (complete[3] === false) {
-            if (clear === true) {
-                inittialize_text(['え', 'えほん', '../src/images/ehon.png'], e_point[0]);
-            }
-            if (count === 0) {
-                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if (drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if (count === 1) {
-                ittkaku_play(e.offsetX, e.offsetY, e_point[count])
-            } else if (count === 2) {
-                itimozi_end(e.offsetX, e.offsetY, 3);
-            }
-
-        } else if (complete[4] === false) {
-            if (clear === true) {
-                inittialize_text(['お', 'おわん', '../src/images/owan.png'], o_point[0]);
-            }
-            if (count === 0) {
-                if (dist(e.offsetX, e.offsetY, end_elps.x, end_elps.y) < dia / 2) {
-                    if (drag_line.isDrag === true) {
-                        count++;
-                    }
-                }
-            } else if (count === 1) {
-                ittkaku_play(e.offsetX, e.offsetY, o_point[count]);
-            } else if (count === 2) {
-                ittkaku_play(e.offsetX, e.offsetY, o_point[count]);
-            } else if (count === 3) {
-                itimozi_end(e.offsetX, e.offsetY, 4);
-            }
-        } else if (complete[4] === true) {
-            text_change('終', 'おわり', '../src/images/owan.png');
+        if(complete[0] === false) {//あ
+            judge = game.play(a_point, [e.offsetX, e.offsetY]);
+            complete.splice(0, 1, judge);
+        } else if(complete[1] === false) {//い
+            text_obj.text_init('い', 'いちご', 'images./itigo.png');
+            judge = game.play(i_point, [e.offsetX, e.offsetY]);
+            complete.splice(1, 1, judge);
+        } else if(complete[2] === false) {//う
+            text_obj.text_init('う', 'うどん', 'images./udon.png');
+            judge = game.play(u_point, [e.offsetX, e.offsetY]);
+            complete.splice(1, 1, judge);
+        } else if(complete[3] === false) {//え
+            text_obj.text_init('え', 'えほん', 'images./ehon.png');
+            judge = game.play(e_point, [e.offsetX, e.offsetY]);
+            complete.splice(1, 1, judge);
+        } else if(complete[4] === false) {//お
+            text_obj.text_init('お', 'おわん', 'images./owan.png')
+            judge = game.play(o_point, [e.offsetX, e.offsetY]);
+            complete.splice(1, 1, judge);
+        } else if(complete[4] === true) {
+            /* end animation here */
         }
-    });
+    })
 }
-
-/*
-        if(count === 0) {
-            console.log('i 1st');
-            next_elps(i_point[0][0], i_point[0][1], i_point[0][2], i_point[0][3])
-            start_elps.draw(context);
-            end_elps.draw(context);
-
-        } else if(count === 1) {
-            console.log('i 2nd');
-            next_elps(i_point[1][0], i_point[1][1], i_point[1][2], i_point[1][3]);
-            start_elps.draw(context);
-            end_elps.draw(context);
-        }
-        */
-
-
-//window.requestAnimationFrame(main)
 
 main();
+
+
