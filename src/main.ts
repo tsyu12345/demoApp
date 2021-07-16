@@ -5,7 +5,8 @@ import "./images/itigo";
 import "./images/owan";
 import "./images/udon";
 import "./images/yokudekistp";
-
+import p5 from 'p5';
+import { runInThisContext } from "vm";
 
 //grobal propaty(仮置き)
 let complete:Array<boolean> = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
@@ -190,8 +191,25 @@ function main() :void {
     const text_obj = new Text(main_text_id, side_text_id, side_img_id);
     const canvas = <HTMLCanvasElement>document.getElementById('draw_area');
     //const context = <CanvasRenderingContext2D> canvas.getContext('2d');
-    draw_line(canvas);
+    //draw_line(canvas);
     const game = new GamePlay(canvas, a_point,);
+
+    const p5_js = (p:p5) => {
+        p.setup = () => {
+            p.createCanvas(canvas.width, canvas.height);
+        }
+        p.draw = () => {
+            //console.log('p5.js functions called');
+            p.fill(0);
+            p.strokeWeight(5);
+            if (p.mouseIsPressed) {
+                p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+            }
+        }
+    }
+    const myp5 = new p5(p5_js, );
+
+    //myp5(p.draw, 'draw_area');
     canvas.addEventListener('mousemove', e => {
         console.log(complete);
         if(complete[0] === false) {//あ
