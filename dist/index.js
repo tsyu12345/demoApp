@@ -648,17 +648,17 @@ var Elps = /** @class */ (function () {
     };
     return Elps;
 }());
+/*
 //線のオブジェクト
-var DragLines = /** @class */ (function () {
-    function DragLines(canvas) {
-        this.context = canvas.getContext("2d");
+class DragLines {
+    context:CanvasRenderingContext2D;
+    isDrag:boolean;
+    constructor(canvas:HTMLCanvasElement) {
+        this.context = <CanvasRenderingContext2D>canvas.getContext("2d");
         this.isDrag = false;
     }
-    /*
-    judge_draw() :boolean {
-    }
-    */
-    DragLines.prototype.draw = function (sx, sy, ex, ey) {
+    
+    draw(sx:number, sy:number, ex:number, ey:number):void {
         this.context.save();
         this.context.lineCap = 'round';
         this.context.lineWidth = 3;
@@ -669,9 +669,9 @@ var DragLines = /** @class */ (function () {
         this.context.closePath();
         this.context.stroke();
         this.context.restore();
-    };
-    return DragLines;
-}());
+    }
+
+}*/
 var Text = /** @class */ (function () {
     function Text(dt_id, st_id, simg_id) {
         this.draw_txt_id = dt_id;
@@ -702,7 +702,7 @@ var GamePlay = /** @class */ (function () {
         this.st_elps.move(point_data[0][0], point_data[0][1]);
         this.ed_elps.move(point_data[0][2], point_data[0][3]);
     };
-    GamePlay.prototype.play = function (point_data /*円の座標配列(len = 4)*/, mouse_point /*マウス座標配列*/, comp_index, end_count) {
+    GamePlay.prototype.play = function (point_data /*円の座標配列(column len = 4)*/, mouse_point /*マウス座標配列*/, comp_index, end_count) {
         //let last_kaku:boolean = false;
         console.log(this.st_elps.x);
         this.st_elps.draw();
@@ -724,9 +724,11 @@ var GamePlay = /** @class */ (function () {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); //clear canvas
             complete.splice(comp_index, 1, true);
             count = 0;
+            return true;
         }
         else {
             complete.splice(comp_index, 1, false);
+            return false;
         }
     };
     return GamePlay;
@@ -770,66 +772,80 @@ function draw_line(canvas:HTMLCanvasElement):void {
 */
 //main function
 function main() {
+    //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
     var a_point = [[160, 190, 315, 183], [215, 174, 217, 305], [271, 200, 240, 330]];
     var i_point = [[170, 173, 230, 260], [270, 189, 307, 283]];
     var u_point = [[199, 154, 285, 170], [166, 240, 202, 310]];
     var e_point = [[189, 158, 276, 160], [169, 205, 329, 310]];
     var o_point = [[162, 186, 265, 181], [210, 142, 247, 272], [281, 160, 334, 220]];
+    //dom elements id
     var main_text_id = 'draw_text';
     var side_text_id = 'side_text';
     var side_img_id = 'side_img';
     var text_obj = new Text(main_text_id, side_text_id, side_img_id);
     var elp_canvas = document.getElementById('draw_area');
+    //init GamePlay class
     var game = new GamePlay(elp_canvas, a_point);
     //const context = <CanvasRenderingContext2D> canvas.getContext('2d');
-    //draw_line(canvas);
+    //p5.js InstanceMode
     var p5_js = function (p) {
+        /*
+        in p5.js,Mouse points is mouseX, mouseY.
+        */
+        var play;
         p.setup = function () {
             p.createCanvas(elp_canvas.width, elp_canvas.height);
         };
         p.draw = function () {
-            //console.log('p5.js functions called');
-            p.fill(0);
-            p.strokeWeight(5);
-            if (p.mouseIsPressed) {
-                p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+            p.fill(0); //line color
+            p.strokeWeight(5); //line weight
+            if (p.mouseIsPressed) { //mousedown event : p.mouseIsPressed
+                p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY); //pmouseX, pmouseY:直前のマウス座標
                 if (complete[0] === false) { //あ
-                    //game.init(a_point);
-                    game.play(a_point, [p.mouseX, p.mouseY], 0, 4);
+                    play = game.play(a_point, [p.mouseX, p.mouseY], 0, 4);
+                    if (play === true) {
+                        clearCanvas();
+                    }
                 }
                 else if (complete[1] === false) { //い
                     text_obj.text_init('い', 'いちご', 'images/itigo.png');
                     if (count === 0) {
                         game.init(i_point);
                     }
-                    game.play(i_point, [p.mouseX, p.mouseY], 1, 2);
+                    play = game.play(i_point, [p.mouseX, p.mouseY], 1, 2);
+                    if (play === true) {
+                        clearCanvas();
+                    }
                 }
                 else if (complete[2] === false) { //う
-                    //count = 0;
                     text_obj.text_init('う', 'うどん', 'images/udon.png');
                     if (count === 0) {
                         game.init(u_point);
                     }
-                    //game.init(u_point);
-                    game.play(u_point, [p.mouseX, p.mouseY], 2, 2);
+                    play = game.play(u_point, [p.mouseX, p.mouseY], 2, 2);
+                    if (play === true) {
+                        clearCanvas();
+                    }
                 }
                 else if (complete[3] === false) { //え
-                    //count = 0;
                     text_obj.text_init('え', 'えほん', 'images/ehon.png');
                     if (count === 0) {
                         game.init(e_point);
                     }
-                    //game.init(e_point);
-                    game.play(e_point, [p.mouseX, p.mouseY], 3, 2);
+                    play = game.play(e_point, [p.mouseX, p.mouseY], 3, 2);
+                    if (play === true) {
+                        clearCanvas();
+                    }
                 }
                 else if (complete[4] === false) { //お
-                    //ount = 0;
                     text_obj.text_init('お', 'おわん', 'images/owan.png');
                     if (count === 0) {
                         game.init(o_point);
                     }
-                    //game.init(o_point);
-                    game.play(o_point, [p.mouseX, p.mouseY], 4, 4);
+                    play = game.play(o_point, [p.mouseX, p.mouseY], 4, 4);
+                    if (play === true) {
+                        clearCanvas();
+                    }
                 }
                 else if (complete[4] === true) {
                     /* end animation here */
@@ -837,9 +853,14 @@ function main() {
                 }
             }
         };
+        function clearCanvas() {
+            console.log('clearCanvas');
+            p.clear();
+            p.redraw();
+            p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+        }
     };
     var myp5 = new (p5__WEBPACK_IMPORTED_MODULE_7___default())(p5_js);
-    var p5_canvas = document.getElementById('defaultCanvas0');
     //const game = new GamePlay(elp_canvas, a_point,);
     /*
     elp_canvas.addEventListener('mousemove', e => {
@@ -884,7 +905,7 @@ function main() {
     })
     */
 }
-main();
+window.addEventListener('load', main, false);
 
 })();
 

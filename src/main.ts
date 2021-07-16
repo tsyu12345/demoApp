@@ -6,7 +6,7 @@ import "./images/owan";
 import "./images/udon";
 import "./images/yokudekistp";
 import p5 from 'p5';
-import { runInThisContext } from "vm";
+
 
 //grobal propaty(仮置き)
 let complete:Array<boolean> = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
@@ -44,7 +44,7 @@ class Elps {
         this.context.clearRect(this.x - this.dia / 2 - 12, this.y - this.dia / 2 - 12, this.dia + 25, this.dia + 25);
     }
 }
-
+/*
 //線のオブジェクト
 class DragLines {
     context:CanvasRenderingContext2D;
@@ -53,10 +53,7 @@ class DragLines {
         this.context = <CanvasRenderingContext2D>canvas.getContext("2d");
         this.isDrag = false;
     }
-    /*
-    judge_draw() :boolean {
-    }
-    */
+    
     draw(sx:number, sy:number, ex:number, ey:number):void {
         this.context.save();
         this.context.lineCap = 'round';
@@ -70,8 +67,7 @@ class DragLines {
         this.context.restore();
     }
 
-}
-
+}*/
 class Text {
     draw_txt_id:string;
     side_txt_id:string;
@@ -112,7 +108,7 @@ class GamePlay {
         this.ed_elps.move(point_data[0][2], point_data[0][3]);
     }
 
-    play(point_data:Array<Array<number>>/*円の座標配列(len = 4)*/, mouse_point:Array<number>/*マウス座標配列*/, comp_index:number, end_count:number):void {
+    play(point_data:Array<Array<number>>/*円の座標配列(column len = 4)*/, mouse_point:Array<number>/*マウス座標配列*/, comp_index:number, end_count:number):boolean {
         //let last_kaku:boolean = false;
         console.log(this.st_elps.x);
         this.st_elps.draw();
@@ -133,9 +129,11 @@ class GamePlay {
             console.log('clear canvas');
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); //clear canvas
             complete.splice(comp_index, 1, true);
-            count = 0; 
+            count = 0;
+            return true; 
         } else {
             complete.splice(comp_index, 1, false);
+            return false;
         }
     }
 }
@@ -180,72 +178,92 @@ function draw_line(canvas:HTMLCanvasElement):void {
 */
 //main function
 function main() :void {
+    //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
     const a_point:Array<Array<number>> = [[160, 190, 315, 183], [215, 174, 217, 305], [271, 200, 240, 330]];
     const i_point:Array<Array<number>> = [[170, 173, 230, 260], [270, 189, 307, 283]];
     const u_point:Array<Array<number>> = [[199, 154, 285, 170], [166, 240, 202, 310]];
     const e_point:Array<Array<number>> = [[189, 158, 276, 160], [169, 205, 329, 310]];
     const o_point:Array<Array<number>> = [[162, 186, 265, 181], [210, 142, 247, 272], [281, 160, 334, 220]];
+    
+    //dom elements id
     const main_text_id:string = 'draw_text';
     const side_text_id:string = 'side_text';
     const side_img_id:string = 'side_img';
     const text_obj = new Text(main_text_id, side_text_id, side_img_id);
     const elp_canvas = <HTMLCanvasElement>document.getElementById('draw_area');
+    //init GamePlay class
     const game = new GamePlay(elp_canvas, a_point);
     //const context = <CanvasRenderingContext2D> canvas.getContext('2d');
-    //draw_line(canvas);
-
+   
+    //p5.js InstanceMode
     const p5_js = (p:p5) => {
-        p.setup = () => {
+        /* 
+        in p5.js,Mouse points is mouseX, mouseY.
+        */
+       let play:boolean;
+        p.setup = () => { //setting canvas
             p.createCanvas(elp_canvas.width, elp_canvas.height);
         }
-        p.draw = () => {
-            //console.log('p5.js functions called');
-            p.fill(0);
-            p.strokeWeight(5);
-            if (p.mouseIsPressed) {
-                p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+        p.draw = () => {//draw  animation
+            p.fill(0);//line color
+            p.strokeWeight(5);//line weight
+            if (p.mouseIsPressed) { //mousedown event : p.mouseIsPressed
+                p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY); //pmouseX, pmouseY:直前のマウス座標
                 if(complete[0] === false) {//あ
-                    //game.init(a_point);
-                    game.play(a_point, [p.mouseX, p.mouseY], 0, 4);
+                    play = game.play(a_point, [p.mouseX, p.mouseY], 0, 4);
+                    if(play===true) {
+                        clearCanvas();
+                    }
                 } else if(complete[1] === false) {//い
                     text_obj.text_init('い', 'いちご', 'images/itigo.png');
                     if(count === 0) {
                         game.init(i_point);
                     }
-                    game.play(i_point, [p.mouseX, p.mouseY], 1, 2);
+                    play = game.play(i_point, [p.mouseX, p.mouseY], 1, 2);
+                    if(play===true) {
+                        clearCanvas();
+                    }
                 } else if(complete[2] === false) {//う
-                    //count = 0;
                     text_obj.text_init('う', 'うどん', 'images/udon.png');
                     if(count === 0) {
                         game.init(u_point);
                     }
-                    //game.init(u_point);
-                    game.play(u_point, [p.mouseX, p.mouseY], 2, 2);
+                    play = game.play(u_point, [p.mouseX, p.mouseY], 2, 2);
+                    if(play===true) {
+                        clearCanvas();
+                    }
                 } else if(complete[3] === false) {//え
-                    //count = 0;
                     text_obj.text_init('え', 'えほん', 'images/ehon.png');
                     if(count === 0) {
                         game.init(e_point);
                     }
-                    //game.init(e_point);
-                    game.play(e_point, [p.mouseX, p.mouseY], 3, 2);
+                    play = game.play(e_point, [p.mouseX, p.mouseY], 3, 2);
+                    if(play===true) {
+                        clearCanvas();
+                    }
                 } else if(complete[4] === false) {//お
-                    //ount = 0;
                     text_obj.text_init('お', 'おわん', 'images/owan.png');
                     if(count === 0) {
                         game.init(o_point);
                     }
-                    //game.init(o_point);
-                    game.play(o_point, [p.mouseX, p.mouseY], 4, 4);
+                    play = game.play(o_point, [p.mouseX, p.mouseY], 4, 4);
+                    if(play===true) {
+                        clearCanvas();
+                    }
                 } else if(complete[4] === true) {
                     /* end animation here */
                     text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
                 }
             }
         }
+        function clearCanvas() {
+            console.log('clearCanvas');
+            p.clear();
+            p.redraw();
+            p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+        }
     }
     const myp5 = new p5(p5_js, );
-    const p5_canvas = <HTMLCanvasElement>document.getElementById('defaultCanvas0');
     
     //const game = new GamePlay(elp_canvas, a_point,);
     /*
@@ -292,6 +310,6 @@ function main() :void {
     */
 }
 
-main();
+window.addEventListener('load', main, false);
 
 
