@@ -26,12 +26,11 @@ body {
 
 #draw_text {
     position: absolute;
-    top:20%;
-    left:20%;
+    top:140px;
+    left:380px;
     font-size: 200px;
     font-weight: bold;
     margin-bottom: 30%;
-    margin-left: 130px;
 }
 
 
