@@ -204,13 +204,14 @@ function main(p:Game /*p5.js*/) {
         console.log(start_draw);
         if(p.mouseIsPressed && start_draw) {
             p.draw_line(5, 0);
+        }
             //if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) <= animation.dia) {
                 
                 if(complete[0] === false) {//あ
                     one_text_comp= animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
                     if(one_text_comp===true) {
                         p.clear_line();
-                        start_draw = true;
+                        
                         one_text_comp = false;
                     }
                 } else if(complete[1] === false) {//い
@@ -221,7 +222,7 @@ function main(p:Game /*p5.js*/) {
                     one_text_comp= animation.play(i_point, [p.mouseX, p.mouseY], 1, 3);
                     if(one_text_comp===true) {
                         p.clear_line();
-                        start_draw = true;
+                        
                         one_text_comp = false;
                     }
                 } else if(complete[2] === false) {//う
@@ -232,7 +233,7 @@ function main(p:Game /*p5.js*/) {
                     one_text_comp= animation.play(u_point, [p.mouseX, p.mouseY], 2, 3);
                     if(one_text_comp===true) {
                         p.clear_line();
-                        start_draw = true;
+                        
                         one_text_comp = false;
                     }
                 } else if(complete[3] === false) {//え
@@ -243,7 +244,7 @@ function main(p:Game /*p5.js*/) {
                     one_text_comp= animation.play(e_point, [p.mouseX, p.mouseY], 3, 3);
                     if(one_text_comp===true) {
                         p.clear_line();
-                        start_draw = true;
+                        
                         one_text_comp = false;
                     }
                 } else if(complete[4] === false) {//お
@@ -254,7 +255,7 @@ function main(p:Game /*p5.js*/) {
                     one_text_comp= animation.play(o_point, [p.mouseX, p.mouseY], 4, 4);
                     if(one_text_comp===true) {
                         p.clear_line();
-                        start_draw = true;
+                        
                         one_text_comp = false;
                     }
                 } else if(complete[4] === true) {
@@ -263,7 +264,7 @@ function main(p:Game /*p5.js*/) {
                 }
             //} else {//マウスを離した場所が円の外な場合、canvasを一つ前の状態に戻す。
                 
-        }
+        
     }
 
     /*mouse Event*/
