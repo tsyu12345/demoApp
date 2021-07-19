@@ -155,14 +155,13 @@ class ElpAnimation {
 
 
 //other functions
-
 function dist(x1: number, y1: number, x2: number, y2: number): number {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
 
 //main function
-function main(p:Game) {
+function main(p:Game /*p5.js*/) {
     //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
     const a_point: Array<Array<number>> = [[160, 190, 315, 183], [215, 174, 217, 305], [271, 200, 240, 330]];
     const i_point: Array<Array<number>> = [[170, 173, 230, 260], [270, 189, 307, 283]];
@@ -180,13 +179,33 @@ function main(p:Game) {
     const animation = new ElpAnimation(elp_canvas, a_point);
     //１文字分の終了判定
     let one_text_comp: boolean = false;
+    let start_draw:boolean = false;
+    let comp_one_turn:boolean = false;
+    //マウスの押した時点での座標、離した時点での座標
+    let downX:number = 0;
+    let downY:number = 0;
+    let relsX:number = 0;
+    let relsY:number = 0;
     
-    p.setup = ()=> {
+    p.setup = ():void=> { //done onece. not loop
         p.createCanvas(elp_canvas.width, elp_canvas.height);
     }
-    p.draw = ()=> {
-        p.draw_line(5, 0);
-        if(p.mouseIsPressed) {
+    p.draw = ():void=> { //animation loop        
+        if(dist(animation.st_elps.x, animation.st_elps.y, downX, downY) >= animation.dia) {//描き初めの判定:初めの円から描き始めてない場合
+            start_draw = false;
+        } else {
+            start_draw = true;
+        }
+        /*
+        if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) >= animation.dia / 2 && start_draw) {//描き終わりの判定：終わりの円に到達してない場合
+            comp_one_turn = false;
+            p.clear();
+        } else {
+            comp_one_turn = true;
+        }
+        */
+        if(p.mouseIsPressed && start_draw) {
+            p.draw_line(5, 0);
             if(complete[0] === false) {//あ
                 one_text_comp= animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
                 if(one_text_comp===true) {
@@ -239,9 +258,20 @@ function main(p:Game) {
             }
         }
     }
+
+    p.mousePressed = ():void => {
+        /* this function is 'canvas.addEventListener('mousedown',e => {..args..})'*/
+        downX = p.mouseX;
+        downY = p.mouseY;
+    }
+
+    p.mouseReleased = ():void => {
+        relsX = p.mouseX;
+        relsY = p.mouseY;
+    }
 }
 
-new Game(main);
+new Game(main); //Game class extend p5.js
 
 
 

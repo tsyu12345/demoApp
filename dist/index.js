@@ -771,7 +771,7 @@ function dist(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 //main function
-function main(p) {
+function main(p /*p5.js*/) {
     //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
     var a_point = [[160, 190, 315, 183], [215, 174, 217, 305], [271, 200, 240, 330]];
     var i_point = [[170, 173, 230, 260], [270, 189, 307, 283]];
@@ -788,12 +788,33 @@ function main(p) {
     var animation = new ElpAnimation(elp_canvas, a_point);
     //１文字分の終了判定
     var one_text_comp = false;
+    var start_draw = false;
+    var comp_one_turn = false;
+    //マウスの押した時点での座標、離した時点での座標
+    var downX = 0;
+    var downY = 0;
+    var relsX = 0;
+    var relsY = 0;
     p.setup = function () {
         p.createCanvas(elp_canvas.width, elp_canvas.height);
     };
     p.draw = function () {
-        p.draw_line(5, 0);
-        if (p.mouseIsPressed) {
+        if (dist(animation.st_elps.x, animation.st_elps.y, downX, downY) >= animation.dia) { //描き初めの判定:初めの円から描き始めてない場合
+            start_draw = false;
+        }
+        else {
+            start_draw = true;
+        }
+        /*
+        if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) >= animation.dia / 2 && start_draw) {//描き終わりの判定：終わりの円に到達してない場合
+            comp_one_turn = false;
+            p.clear();
+        } else {
+            comp_one_turn = true;
+        }
+        */
+        if (p.mouseIsPressed && start_draw) {
+            p.draw_line(5, 0);
             if (complete[0] === false) { //あ
                 one_text_comp = animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
                 if (one_text_comp === true) {
@@ -851,8 +872,17 @@ function main(p) {
             }
         }
     };
+    p.mousePressed = function () {
+        /* this function is 'canvas.addEventListener('mousedown',e => {..args..})'*/
+        downX = p.mouseX;
+        downY = p.mouseY;
+    };
+    p.mouseReleased = function () {
+        relsX = p.mouseX;
+        relsY = p.mouseY;
+    };
 }
-new Game(main);
+new Game(main); //Game class extend p5.js
 
 })();
 
