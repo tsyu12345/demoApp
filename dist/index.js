@@ -611,6 +611,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _images_yokudekistp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./images/yokudekistp */ "./src/images/yokudekistp.png");
 /* harmony import */ var p5__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! p5 */ "./node_modules/p5/lib/p5.min.js");
 /* harmony import */ var p5__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(p5__WEBPACK_IMPORTED_MODULE_7__);
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 
 
 
@@ -648,6 +663,24 @@ var Elps = /** @class */ (function () {
     };
     return Elps;
 }());
+var Game = /** @class */ (function (_super) {
+    __extends(Game, _super);
+    function Game() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Game.prototype.draw_line = function (weight, color) {
+        this.fill(color);
+        this.strokeWeight(weight);
+        if (this.mouseIsPressed) {
+            this.line(this.mouseX, this.mouseY, this.pmouseX, this.pmouseY);
+        }
+    };
+    Game.prototype.clear_line = function () {
+        this.clear();
+        this.line(this.mouseX, this.mouseY, this.pmouseX, this.pmouseY);
+    };
+    return Game;
+}((p5__WEBPACK_IMPORTED_MODULE_7___default())));
 /*
 //線のオブジェクト
 class DragLines {
@@ -688,8 +721,8 @@ var Text = /** @class */ (function () {
     };
     return Text;
 }());
-var GamePlay = /** @class */ (function () {
-    function GamePlay(canvas_in, init_point_data) {
+var ElpAnimation = /** @class */ (function () {
+    function ElpAnimation(canvas_in, init_point_data) {
         this.dia = 20;
         this.canvas = canvas_in;
         this.context = this.canvas.getContext("2d");
@@ -698,11 +731,11 @@ var GamePlay = /** @class */ (function () {
         this.st_elps.draw();
         this.ed_elps.draw();
     }
-    GamePlay.prototype.init = function (point_data) {
+    ElpAnimation.prototype.init = function (point_data) {
         this.st_elps.move(point_data[0][0], point_data[0][1]);
         this.ed_elps.move(point_data[0][2], point_data[0][3]);
     };
-    GamePlay.prototype.play = function (point_data /*円の座標配列(column len = 4)*/, mouse_point /*マウス座標配列*/, comp_index, end_count) {
+    ElpAnimation.prototype.play = function (point_data /*円の座標配列(column len = 4)*/, mouse_point /*マウス座標配列*/, comp_index, end_count) {
         //let last_kaku:boolean = false;
         console.log(this.st_elps.x);
         this.st_elps.draw();
@@ -731,47 +764,14 @@ var GamePlay = /** @class */ (function () {
             return false;
         }
     };
-    return GamePlay;
+    return ElpAnimation;
 }());
 //other functions
 function dist(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
-/*
-function draw_line(canvas:HTMLCanvasElement):void {
-    const drag_line = new DragLines(canvas);
-    canvas.addEventListener('mouseout', e => {
-        drag_line.isDrag = false;
-    });
-
-    canvas.addEventListener('mouseup', e => {
-        //console.log('mouse released')
-        drag_line.isDrag = false;
-    });
-
-    canvas.addEventListener('mousedown', e => {
-        drag_line.isDrag = true;
-    })
-
-    canvas.addEventListener('mousemove', e => {
-        const downX :number= e.offsetX;
-        const downY :number= e.offsetY;
-        let prex :number= downX;
-        let prey :number= downY;
-        //drag_line.isDrag = true;
-        if (drag_line.isDrag === true) {
-            drag_line.draw(prex, prey, downX, downY);
-            prex = downX;
-            prey = downY;
-
-        } else {
-            return;
-        }
-    });
-}
-*/
 //main function
-function main() {
+function main(p) {
     //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
     var a_point = [[160, 190, 315, 183], [215, 174, 217, 305], [271, 200, 240, 330]];
     var i_point = [[170, 173, 230, 260], [270, 189, 307, 283]];
@@ -784,128 +784,75 @@ function main() {
     var side_img_id = 'side_img';
     var text_obj = new Text(main_text_id, side_text_id, side_img_id);
     var elp_canvas = document.getElementById('draw_area');
-    //init GamePlay class
-    var game = new GamePlay(elp_canvas, a_point);
-    //const context = <CanvasRenderingContext2D> canvas.getContext('2d');
-    //p5.js InstanceMode
-    var p5_js = function (p) {
-        /*
-        in p5.js,Mouse points is mouseX, mouseY.
-        */
-        var play;
-        p.setup = function () {
-            p.createCanvas(elp_canvas.width, elp_canvas.height);
-        };
-        p.draw = function () {
-            p.fill(0); //line color
-            p.strokeWeight(5); //line weight
-            if (p.mouseIsPressed) { //mousedown event : p.mouseIsPressed
-                p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY); //pmouseX, pmouseY:直前のマウス座標
-                if (complete[0] === false) { //あ
-                    play = game.play(a_point, [p.mouseX, p.mouseY], 0, 4);
-                    if (play === true) {
-                        clearCanvas();
-                    }
-                }
-                else if (complete[1] === false) { //い
-                    text_obj.text_init('い', 'いちご', 'images/itigo.png');
-                    if (count === 0) {
-                        game.init(i_point);
-                    }
-                    play = game.play(i_point, [p.mouseX, p.mouseY], 1, 2);
-                    if (play === true) {
-                        clearCanvas();
-                    }
-                }
-                else if (complete[2] === false) { //う
-                    text_obj.text_init('う', 'うどん', 'images/udon.png');
-                    if (count === 0) {
-                        game.init(u_point);
-                    }
-                    play = game.play(u_point, [p.mouseX, p.mouseY], 2, 2);
-                    if (play === true) {
-                        clearCanvas();
-                    }
-                }
-                else if (complete[3] === false) { //え
-                    text_obj.text_init('え', 'えほん', 'images/ehon.png');
-                    if (count === 0) {
-                        game.init(e_point);
-                    }
-                    play = game.play(e_point, [p.mouseX, p.mouseY], 3, 2);
-                    if (play === true) {
-                        clearCanvas();
-                    }
-                }
-                else if (complete[4] === false) { //お
-                    text_obj.text_init('お', 'おわん', 'images/owan.png');
-                    if (count === 0) {
-                        game.init(o_point);
-                    }
-                    play = game.play(o_point, [p.mouseX, p.mouseY], 4, 4);
-                    if (play === true) {
-                        clearCanvas();
-                    }
-                }
-                else if (complete[4] === true) {
-                    /* end animation here */
-                    text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
+    //init animation class
+    var animation = new ElpAnimation(elp_canvas, a_point);
+    //１文字分の終了判定
+    var one_text_comp = false;
+    p.setup = function () {
+        p.createCanvas(elp_canvas.width, elp_canvas.height);
+    };
+    p.draw = function () {
+        p.draw_line(5, 0);
+        if (p.mouseIsPressed) {
+            if (complete[0] === false) { //あ
+                one_text_comp = animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
+                if (one_text_comp === true) {
+                    p.clear_line();
+                    one_text_comp = false;
                 }
             }
-        };
-        function clearCanvas() {
-            console.log('clearCanvas');
-            p.clear();
-            p.redraw();
-            p.line(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
+            else if (complete[1] === false) { //い
+                text_obj.text_init('い', 'いちご', 'images/itigo.png');
+                if (one_text_comp === false) {
+                    animation.init(i_point);
+                }
+                one_text_comp = animation.play(i_point, [p.mouseX, p.mouseY], 1, 2);
+                if (one_text_comp === true) {
+                    p.clear_line();
+                    one_text_comp = false;
+                }
+            }
+            else if (complete[2] === false) { //う
+                text_obj.text_init('う', 'うどん', 'images/udon.png');
+                if (one_text_comp === false) {
+                    animation.init(u_point);
+                }
+                one_text_comp = animation.play(u_point, [p.mouseX, p.mouseY], 2, 2);
+                if (one_text_comp === true) {
+                    p.clear_line();
+                    one_text_comp = false;
+                }
+            }
+            else if (complete[3] === false) { //え
+                text_obj.text_init('え', 'えほん', 'images/ehon.png');
+                if (one_text_comp === false) {
+                    animation.init(e_point);
+                }
+                one_text_comp = animation.play(e_point, [p.mouseX, p.mouseY], 3, 2);
+                if (one_text_comp === true) {
+                    p.clear_line();
+                    one_text_comp = false;
+                }
+            }
+            else if (complete[4] === false) { //お
+                text_obj.text_init('お', 'おわん', 'images/owan.png');
+                if (one_text_comp === false) {
+                    animation.init(o_point);
+                }
+                one_text_comp = animation.play(o_point, [p.mouseX, p.mouseY], 4, 4);
+                if (one_text_comp === true) {
+                    p.clear_line();
+                    one_text_comp = false;
+                }
+            }
+            else if (complete[4] === true) {
+                // end animation here 
+                text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
+            }
         }
     };
-    var myp5 = new (p5__WEBPACK_IMPORTED_MODULE_7___default())(p5_js);
-    //const game = new GamePlay(elp_canvas, a_point,);
-    /*
-    elp_canvas.addEventListener('mousemove', e => {
-        console.log(complete);
-        if(complete[0] === false) {//あ
-            //game.init(a_point);
-            game.play(a_point, [e.offsetX, e.offsetY], 0, 4);
-        } else if(complete[1] === false) {//い
-            text_obj.text_init('い', 'いちご', 'images/itigo.png');
-            if(count === 0) {
-                game.init(i_point);
-            }
-            game.play(i_point, [e.offsetX, e.offsetY], 1, 2);
-        } else if(complete[2] === false) {//う
-            //count = 0;
-            text_obj.text_init('う', 'うどん', 'images/udon.png');
-            if(count === 0) {
-                game.init(u_point);
-            }
-            //game.init(u_point);
-            game.play(u_point, [e.offsetX, e.offsetY], 2, 2);
-        } else if(complete[3] === false) {//え
-            //count = 0;
-            text_obj.text_init('え', 'えほん', 'images/ehon.png');
-            if(count === 0) {
-                game.init(e_point);
-            }
-            //game.init(e_point);
-            game.play(e_point, [e.offsetX, e.offsetY], 3, 2);
-        } else if(complete[4] === false) {//お
-            //ount = 0;
-            text_obj.text_init('お', 'おわん', 'images/owan.png');
-            if(count === 0) {
-                game.init(o_point);
-            }
-            //game.init(o_point);
-            game.play(o_point, [e.offsetX, e.offsetY], 4, 4);
-        } else if(complete[4] === true) {
-            end animation here
-            text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
-        }
-    })
-    */
 }
-window.addEventListener('load', main, false);
+new Game(main);
 
 })();
 
