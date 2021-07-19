@@ -195,37 +195,37 @@ function main(p:Game) {
                 }
             } else if(complete[1] === false) {//い
                 text_obj.text_init('い', 'いちご', 'images/itigo.png');
-                if(one_text_comp===false) {
+                if(count === 0) {
                     animation.init(i_point);
                 }
-                one_text_comp= animation.play(i_point, [p.mouseX, p.mouseY], 1, 2);
+                one_text_comp= animation.play(i_point, [p.mouseX, p.mouseY], 1, 3);
                 if(one_text_comp===true) {
                     p.clear_line();
                     one_text_comp = false;
                 }
             } else if(complete[2] === false) {//う
                 text_obj.text_init('う', 'うどん', 'images/udon.png');
-                if(one_text_comp===false) {
+                if(count === 0) {
                     animation.init(u_point);
                 }
-                one_text_comp= animation.play(u_point, [p.mouseX, p.mouseY], 2, 2);
+                one_text_comp= animation.play(u_point, [p.mouseX, p.mouseY], 2, 3);
                 if(one_text_comp===true) {
                     p.clear_line();
                     one_text_comp = false;
                 }
             } else if(complete[3] === false) {//え
                 text_obj.text_init('え', 'えほん', 'images/ehon.png');
-                if(one_text_comp===false) {
+                if(count === 0) {
                     animation.init(e_point);
                 }
-                one_text_comp= animation.play(e_point, [p.mouseX, p.mouseY], 3, 2);
+                one_text_comp= animation.play(e_point, [p.mouseX, p.mouseY], 3, 3);
                 if(one_text_comp===true) {
                     p.clear_line();
                     one_text_comp = false;
                 }
             } else if(complete[4] === false) {//お
                 text_obj.text_init('お', 'おわん', 'images/owan.png');
-                if(one_text_comp===false) {
+                if(count === 0) {
                     animation.init(o_point);
                 }
                 one_text_comp= animation.play(o_point, [p.mouseX, p.mouseY], 4, 4);
