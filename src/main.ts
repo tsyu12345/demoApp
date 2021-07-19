@@ -130,7 +130,6 @@ class ElpAnimation {
         this.st_elps.draw();
         this.ed_elps.draw();
         for (let i: number = 0; i < point_data.length - 1; i++) {
-            console.log(count);
             if (dist(this.ed_elps.x, this.ed_elps.y, mouse_point[0], mouse_point[1]) <= this.dia / 2) {
                 this.st_elps.delete();
                 this.ed_elps.delete();
@@ -160,11 +159,6 @@ function dist(x1: number, y1: number, x2: number, y2: number): number {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
-function undo(context: CanvasRenderingContext2D) {
-
-}
-
-
 //main function
 function main(p:Game /*p5.js*/) {
     //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
@@ -180,6 +174,9 @@ function main(p:Game /*p5.js*/) {
     const side_img_id: string = 'side_img';
     const text_obj = new Text(main_text_id, side_text_id, side_img_id);
     const elp_canvas = <HTMLCanvasElement>document.getElementById('draw_area');
+    const ctx = elp_canvas!.getContext('2d');
+   
+    let line_canvas:HTMLCanvasElement;
     //init animation class
     const animation = new ElpAnimation(elp_canvas, a_point);
     //１文字分の終了判定
@@ -191,22 +188,26 @@ function main(p:Game /*p5.js*/) {
     let downY:number = 0;
     let relsX:number = 0;
     let relsY:number = 0;
+    //canvasの状態保持変数
+    let pre_canvas:ImageData;
     
     p.setup = ():void=> { //done onece. not loop
         p.createCanvas(elp_canvas.width, elp_canvas.height);
     }
+
     p.draw = ():void=> { //animation loop        
         if(dist(animation.st_elps.x, animation.st_elps.y, downX, downY) >= animation.dia) {//描き初めの判定:初めの円から描き始めてない場合
             start_draw = false;
         } else {
             start_draw = true;
         }
-        console.log(start_draw);
         if(p.mouseIsPressed && start_draw) {
             p.draw_line(5, 0);
         }
-            //if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) <= animation.dia) {
-                
+        
+        if(p.mouseIsPressed) {
+            if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) <= animation.dia) {
+                pre_canvas = ctx!.getImageData(0, 0, elp_canvas.width, elp_canvas.height)
                 if(complete[0] === false) {//あ
                     one_text_comp= animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
                     if(one_text_comp===true) {
@@ -262,9 +263,10 @@ function main(p:Game /*p5.js*/) {
                     // end animation here 
                     text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
                 }
-            //} else {//マウスを離した場所が円の外な場合、canvasを一つ前の状態に戻す。
-                
-        
+            } else {//マウスを離した場所が円の外な場合、canvasを一つ前の状態に戻す。
+                ctx!.putImageData(pre_canvas, 0, 0);
+            }
+        }   
     }
 
     /*mouse Event*/
