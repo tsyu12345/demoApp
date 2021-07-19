@@ -770,6 +770,8 @@ var ElpAnimation = /** @class */ (function () {
 function dist(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
+function undo(context) {
+}
 //main function
 function main(p /*p5.js*/) {
     //各円の描画座標を格納した２次元配列:Array[画数][始点x, 始点y, 終点x, 終点y]
@@ -805,20 +807,15 @@ function main(p /*p5.js*/) {
         else {
             start_draw = true;
         }
-        /*
-        if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) >= animation.dia / 2 && start_draw) {//描き終わりの判定：終わりの円に到達してない場合
-            comp_one_turn = false;
-            p.clear();
-        } else {
-            comp_one_turn = true;
-        }
-        */
+        console.log(start_draw);
         if (p.mouseIsPressed && start_draw) {
             p.draw_line(5, 0);
+            //if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) <= animation.dia) {
             if (complete[0] === false) { //あ
                 one_text_comp = animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
                 if (one_text_comp === true) {
                     p.clear_line();
+                    start_draw = true;
                     one_text_comp = false;
                 }
             }
@@ -830,6 +827,7 @@ function main(p /*p5.js*/) {
                 one_text_comp = animation.play(i_point, [p.mouseX, p.mouseY], 1, 3);
                 if (one_text_comp === true) {
                     p.clear_line();
+                    start_draw = true;
                     one_text_comp = false;
                 }
             }
@@ -841,6 +839,7 @@ function main(p /*p5.js*/) {
                 one_text_comp = animation.play(u_point, [p.mouseX, p.mouseY], 2, 3);
                 if (one_text_comp === true) {
                     p.clear_line();
+                    start_draw = true;
                     one_text_comp = false;
                 }
             }
@@ -852,6 +851,7 @@ function main(p /*p5.js*/) {
                 one_text_comp = animation.play(e_point, [p.mouseX, p.mouseY], 3, 3);
                 if (one_text_comp === true) {
                     p.clear_line();
+                    start_draw = true;
                     one_text_comp = false;
                 }
             }
@@ -863,6 +863,7 @@ function main(p /*p5.js*/) {
                 one_text_comp = animation.play(o_point, [p.mouseX, p.mouseY], 4, 4);
                 if (one_text_comp === true) {
                     p.clear_line();
+                    start_draw = true;
                     one_text_comp = false;
                 }
             }
@@ -870,8 +871,10 @@ function main(p /*p5.js*/) {
                 // end animation here 
                 text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
             }
+            //} else {//マウスを離した場所が円の外な場合、canvasを一つ前の状態に戻す。
         }
     };
+    /*mouse Event*/
     p.mousePressed = function () {
         /* this function is 'canvas.addEventListener('mousedown',e => {..args..})'*/
         downX = p.mouseX;

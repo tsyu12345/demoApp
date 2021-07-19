@@ -8,6 +8,7 @@ import "./images/yokudekistp";
 import p5 from 'p5';
 
 
+
 //grobal propaty(仮置き)
 let complete: Array<boolean> = [false, false, false, false, false,]; //文字の終了状態を示す[あ、い、う、え、お]
 let count: number = 0;
@@ -159,6 +160,10 @@ function dist(x1: number, y1: number, x2: number, y2: number): number {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
+function undo(context: CanvasRenderingContext2D) {
+
+}
+
 
 //main function
 function main(p:Game /*p5.js*/) {
@@ -196,69 +201,72 @@ function main(p:Game /*p5.js*/) {
         } else {
             start_draw = true;
         }
-        /*
-        if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) >= animation.dia / 2 && start_draw) {//描き終わりの判定：終わりの円に到達してない場合
-            comp_one_turn = false;
-            p.clear();
-        } else {
-            comp_one_turn = true;
-        }
-        */
+        console.log(start_draw);
         if(p.mouseIsPressed && start_draw) {
             p.draw_line(5, 0);
-            if(complete[0] === false) {//あ
-                one_text_comp= animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
-                if(one_text_comp===true) {
-                    p.clear_line();
-                    one_text_comp = false;
+            //if(dist(animation.ed_elps.x, animation.ed_elps.y, relsX, relsY) <= animation.dia) {
+                
+                if(complete[0] === false) {//あ
+                    one_text_comp= animation.play(a_point, [p.mouseX, p.mouseY], 0, 4);
+                    if(one_text_comp===true) {
+                        p.clear_line();
+                        start_draw = true;
+                        one_text_comp = false;
+                    }
+                } else if(complete[1] === false) {//い
+                    text_obj.text_init('い', 'いちご', 'images/itigo.png');
+                    if(count === 0) {
+                        animation.init(i_point);
+                    }
+                    one_text_comp= animation.play(i_point, [p.mouseX, p.mouseY], 1, 3);
+                    if(one_text_comp===true) {
+                        p.clear_line();
+                        start_draw = true;
+                        one_text_comp = false;
+                    }
+                } else if(complete[2] === false) {//う
+                    text_obj.text_init('う', 'うどん', 'images/udon.png');
+                    if(count === 0) {
+                        animation.init(u_point);
+                    }
+                    one_text_comp= animation.play(u_point, [p.mouseX, p.mouseY], 2, 3);
+                    if(one_text_comp===true) {
+                        p.clear_line();
+                        start_draw = true;
+                        one_text_comp = false;
+                    }
+                } else if(complete[3] === false) {//え
+                    text_obj.text_init('え', 'えほん', 'images/ehon.png');
+                    if(count === 0) {
+                        animation.init(e_point);
+                    }
+                    one_text_comp= animation.play(e_point, [p.mouseX, p.mouseY], 3, 3);
+                    if(one_text_comp===true) {
+                        p.clear_line();
+                        start_draw = true;
+                        one_text_comp = false;
+                    }
+                } else if(complete[4] === false) {//お
+                    text_obj.text_init('お', 'おわん', 'images/owan.png');
+                    if(count === 0) {
+                        animation.init(o_point);
+                    }
+                    one_text_comp= animation.play(o_point, [p.mouseX, p.mouseY], 4, 4);
+                    if(one_text_comp===true) {
+                        p.clear_line();
+                        start_draw = true;
+                        one_text_comp = false;
+                    }
+                } else if(complete[4] === true) {
+                    // end animation here 
+                    text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
                 }
-            } else if(complete[1] === false) {//い
-                text_obj.text_init('い', 'いちご', 'images/itigo.png');
-                if(count === 0) {
-                    animation.init(i_point);
-                }
-                one_text_comp= animation.play(i_point, [p.mouseX, p.mouseY], 1, 3);
-                if(one_text_comp===true) {
-                    p.clear_line();
-                    one_text_comp = false;
-                }
-            } else if(complete[2] === false) {//う
-                text_obj.text_init('う', 'うどん', 'images/udon.png');
-                if(count === 0) {
-                    animation.init(u_point);
-                }
-                one_text_comp= animation.play(u_point, [p.mouseX, p.mouseY], 2, 3);
-                if(one_text_comp===true) {
-                    p.clear_line();
-                    one_text_comp = false;
-                }
-            } else if(complete[3] === false) {//え
-                text_obj.text_init('え', 'えほん', 'images/ehon.png');
-                if(count === 0) {
-                    animation.init(e_point);
-                }
-                one_text_comp= animation.play(e_point, [p.mouseX, p.mouseY], 3, 3);
-                if(one_text_comp===true) {
-                    p.clear_line();
-                    one_text_comp = false;
-                }
-            } else if(complete[4] === false) {//お
-                text_obj.text_init('お', 'おわん', 'images/owan.png');
-                if(count === 0) {
-                    animation.init(o_point);
-                }
-                one_text_comp= animation.play(o_point, [p.mouseX, p.mouseY], 4, 4);
-                if(one_text_comp===true) {
-                    p.clear_line();
-                    one_text_comp = false;
-                }
-            } else if(complete[4] === true) {
-                // end animation here 
-                text_obj.text_init('終', 'おしまい', 'images/yokudekistp.png');
-            }
+            //} else {//マウスを離した場所が円の外な場合、canvasを一つ前の状態に戻す。
+                
         }
     }
 
+    /*mouse Event*/
     p.mousePressed = ():void => {
         /* this function is 'canvas.addEventListener('mousedown',e => {..args..})'*/
         downX = p.mouseX;
